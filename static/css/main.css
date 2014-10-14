@@ -1,0 +1,114 @@
+body{
+	background-color:#29508B;
+	color:#333;
+	font-family:'Droid Sans', Verdana, 'Microsoft YaHei', Tahoma, sans-serif;
+	font-size:12px;
+}#pageHeader h1{
+	font-weight: normal;
+	color: #111;
+	text-align: center;
+	border-bottom: 1px solid #ddd;
+}table thead tr .header{
+	background-position:right center;
+	background-repeat:no-repeat;
+	cursor:pointer;
+	text-align: center;
+}.userlist{
+	margin:0;
+	padding:0;
+	font-size:100%;
+	font:inherit;
+	vertical-align:baseline;
+	background:#f7f7f7;
+	width: 100%;
+	text-align: center;
+}th{
+	font-weight:bold;
+}thead th{
+	background:#c3d9ff;
+	padding:4px 10px 4px 5px;
+}tr.even td {
+background:#e5ecf9;
+}input{
+	border: 1px solid #BBB;
+	text-align: center;
+}#field input{
+
+	margin-top: 10px;
+	margin-bottom: 10px;
+}input:focus{
+    border-color: #666;
+    outline: none
+}.container{
+	padding:20px;
+	margin:0px auto;
+	width:1018px;
+	background:#fafafa;
+	box-shadow:1px 1px 8px black;
+}#pageHeader {
+	clear: both;
+}.notice {
+	background: #fff6bf;
+	color: #514721;
+	padding: 0.8em;
+	margin-bottom: 1em;
+	border: 2px solid #ffd324;
+}div.actions input{
+	background-color:#DD4C39;
+	border:0px;
+	padding:3px 13px;
+	color:white;
+	font-size:13px;
+}div.actions input:hover{
+	background-color:#F75540;
+}div.actions input:active{
+	background-color:#913225;
+}#navibar a {
+display: block;
+font-weight: bold;
+padding: 3px 15px;
+text-decoration: none;
+color: #8DA2B8;
+}#navibar {
+margin-bottom: 2em;
+}#navibar ul {
+list-style-type: none;
+padding-left: 0;
+margin-right: 0;
+}#navibar li:hover{
+	background:none repeat scroll 0 0 #eee;
+}#navibar span {
+color: #DD4C39;
+font-weight: bold;
+display: block;
+padding: 3px 15px;
+text-decoration: none;
+}.span-3 {
+	float: left;
+margin-right: 10px;
+width: 110px;
+}.span-22 {
+	float: left;
+margin-right: 10px;
+width: 870px;
+}#body {
+margin-bottom: 2em;
+}#pageFooter {
+color: #aaa;
+font-size: 11px;
+margin: 0 auto;
+width: 1018px;
+}.clearfix:after,.container:after{
+	content:"\0020";
+	display:block;
+	height:0;
+	clear:both;
+	visibility:hidden;
+	overflow:hidden;
+}.clearfix,.container{
+	display:block;
+}.clear{
+	clear:both;
+}label{
+	font-weight: bold;
+}

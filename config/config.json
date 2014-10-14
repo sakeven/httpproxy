@@ -1,0 +1,11 @@
+{"port":":8080",
+"webport":":6060",
+"reverse":false,
+"proxy_pass":"127.0.0.1:80",
+"auth":false,
+"cache":true,
+"cache_timeout":60,
+"log":0,
+"gfwlist":[],
+"admin":{"Admin":"prxy"},
+"user":{"proxy":"proxy"}}
