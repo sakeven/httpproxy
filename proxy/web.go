@@ -11,7 +11,6 @@ import (
 )
 
 type WebServer struct {
-	//端口
 	Port string
 }
 
@@ -20,7 +19,6 @@ func NewWebServer() *WebServer {
 }
 
 // ServeHTTP handles web admin pages
-// 处理web管理页面的请求
 func (ws *WebServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	if err := ws.WebAuth(rw, req); err != nil {
 		log.Debug("%v", err)
@@ -51,7 +49,6 @@ type data struct {
 }
 
 // HomeHandler handles web home page
-// 处理home页面
 func (ws *WebServer) HomeHandler(rw http.ResponseWriter, req *http.Request) {
 	t := template.New("layout.tpl")
 	t, err := t.ParseFiles("views/layout.tpl", "views/home.tpl")
@@ -70,7 +67,6 @@ func (ws *WebServer) HomeHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 // UserHandler handles user-list page
-// 处理用户列表，有列出、修改、删除、增加用户等功能
 func (ws *WebServer) UserHandler(rw http.ResponseWriter, req *http.Request) {
 	p := strings.Trim(req.URL.Path, "/")
 	s := strings.Split(p, "/")
@@ -81,7 +77,7 @@ func (ws *WebServer) UserHandler(rw http.ResponseWriter, req *http.Request) {
 
 	user := s[2]
 	switch s[1] {
-	case "list": //列出所有用户
+	case "list": //list all users
 		t := template.New("layout.tpl")
 		t, err := t.ParseFiles("views/layout.tpl", "views/user.tpl")
 		if err != nil {
@@ -96,14 +92,14 @@ func (ws *WebServer) UserHandler(rw http.ResponseWriter, req *http.Request) {
 			http.Error(rw, "tpl error", 500)
 			return
 		}
-	case "modify": //修改特定用户
+	case "modify": //modify specific user
 		passwd := req.FormValue("passwd")
 		if passwd != "" {
 			cnfg.User[user] = passwd
 		}
-	case "delete": //删除指定用户
+	case "delete": //delete specific user
 		delete(cnfg.User, user)
-	case "add": //添加新用户
+	case "add": //add new user
 		user := req.FormValue("user")
 		passwd := req.FormValue("passwd")
 		if cnfg.User[user] != "" {
@@ -118,8 +114,7 @@ func (ws *WebServer) UserHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-//SettingHandler allows admin modifies proxy's setting.
-// 用于代理服务器的配置文件设置
+// SettingHandler allows admin modifies proxy's setting.
 func (ws *WebServer) SettingHandler(rw http.ResponseWriter, req *http.Request) {
 	p := strings.Trim(req.URL.Path, "/")
 	s := strings.Split(p, "/")
@@ -168,7 +163,6 @@ func (ws *WebServer) SettingHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 // WebAuth
-// 处理web管理页面的管理元验证与登入
 func (ws *WebServer) WebAuth(rw http.ResponseWriter, req *http.Request) error {
 	auth := req.Header.Get("Authorization")
 	auth = strings.Replace(auth, "Basic ", "", 1)

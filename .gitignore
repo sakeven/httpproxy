@@ -6,6 +6,7 @@
 # Folders
 _obj
 _test
+tmp
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -19,7 +20,5 @@ _cgo_export.*
 
 _testmain.go
 
-httpproxy
 *.exe
-*.test
-*.prof
+httpproxy

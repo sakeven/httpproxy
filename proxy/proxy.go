@@ -80,6 +80,7 @@ func (proxy *ProxyServer) ReverseHandler(req *http.Request) {
 func (proxy *ProxyServer) HttpHandler(rw http.ResponseWriter, req *http.Request) {
 	log.Info("%v is sending request %v %v \n", proxy.User, req.Method, req.URL.Host)
 	RmProxyHeaders(req)
+
 	resp, err := proxy.Tr.RoundTrip(req)
 	if err != nil {
 		log.Error("%v", err)

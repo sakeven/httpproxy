@@ -6,7 +6,6 @@ import (
 
 // CopyHeaders copy headers from source to destination.
 // Nothing would be returned.
-// 拷贝HTTP头
 func CopyHeaders(rw, resp http.Header) {
 	for key, values := range resp {
 		for _, value := range values {
@@ -16,7 +15,6 @@ func CopyHeaders(rw, resp http.Header) {
 }
 
 // ClearHeaders clear headers.
-// 清理HTTP头
 func ClearHeaders(headers http.Header) {
 	for key, _ := range headers {
 		headers.Del(key)
@@ -24,7 +22,6 @@ func ClearHeaders(headers http.Header) {
 }
 
 // RmProxyHeaders remove Hop-by-hop headers.
-// 删除http逐跳头
 func RmProxyHeaders(req *http.Request) {
 	req.RequestURI = ""
 	req.Header.Del("Proxy-Connection")

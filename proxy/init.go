@@ -7,7 +7,7 @@ import (
 	stdlog "log"
 )
 
-var log = logging.MustGetLogger("package.example")
+var log = logging.MustGetLogger("proxy")
 var cnfg config.Config
 
 //setLog() sets log output format.
@@ -26,11 +26,11 @@ func setLog() {
 		format = logging.MustStringFormatter("%{level} %{message}")
 	}
 	logging.SetFormatter(format)
-	logging.SetLevel(level, "package.example")
+	logging.SetLevel(level, "proxy")
 }
 
 func init() {
-	Caches = make(map[string]*cache.Cache)
+	Caches = make(map[cache.Checksum]*cache.Cache)
 	err := cnfg.GetConfig("config/config.json")
 	if err != nil {
 		stdlog.Fatal(err)

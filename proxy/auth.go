@@ -10,7 +10,6 @@ import (
 var HTTP_407 = []byte("HTTP/1.1 407 Proxy Authorization Required\r\nProxy-Authenticate: Basic realm=\"Secure Proxys\"\r\n\r\n")
 
 //Auth provides basic authorizaton for proxy server.
-//验证用户登入，如果不能登入将返回一个error
 func (proxy *ProxyServer) Auth(rw http.ResponseWriter, req *http.Request) (string, error) {
 
 	auth := req.Header.Get("Proxy-Authorization")
@@ -43,7 +42,6 @@ func (proxy *ProxyServer) Auth(rw http.ResponseWriter, req *http.Request) (strin
 	return user, nil
 }
 
-// 代理服务器需要验证，发送验证响应
 func NeedAuth(rw http.ResponseWriter, challenge []byte) error {
 	hj, _ := rw.(http.Hijacker)
 	Client, _, err := hj.Hijack()
@@ -56,7 +54,7 @@ func NeedAuth(rw http.ResponseWriter, challenge []byte) error {
 	return nil
 }
 
-// 验证用户名和密码
+// Check checks username and password
 func Check(user, passwd string) bool {
 	if user != "" && passwd != "" && cnfg.User[user] == passwd {
 		return true

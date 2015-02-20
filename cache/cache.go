@@ -2,6 +2,7 @@
 package cache
 
 import (
+	"crypto/sha1"
 	"errors"
 	"net/http"
 	"strings"
@@ -36,7 +37,6 @@ func (c *Cache) CopyHeaders(src http.Header) {
 }
 
 //SetCache sets a new cache.
-//SetCache 设置一个新的cache
 func (c *Cache) SetCache(StatusCode int, Body string) (err error) {
 	c.Lock()
 	defer c.Unlock()
@@ -108,16 +108,30 @@ func (c *Cache) Verify() bool {
 	return true
 }
 
-type CacheSet map[string]*Cache
+type Checksum [20]byte
+type CacheSet map[Checksum]*Cache
+
+func getCheckSum(URI string) Checksum {
+	return sha1.Sum([]byte(URI))
+}
 
 // GetCache finds specific cache dertermined by URI,if not Found nil will be return.
 func (c *CacheSet) GetCache(URI string) *Cache {
-	return (*c)[URI]
+	return (*c)[getCheckSum(URI)]
 }
 
 // Delete deletes specific cache.
 func (c *CacheSet) Delete(URI string) {
-	delete(*c, URI)
+	delete(*c, getCheckSum(URI))
+}
+func (c *CacheSet) DeleteByCheckSum(key Checksum) {
+	delete(*c, key)
+}
+
+// New returns a new cache.
+func (c *CacheSet) New(URI string) *Cache {
+	(*c)[getCheckSum(URI)].URI = URI
+	return (*c)[getCheckSum(URI)]
 }
 
 //getAge from Cache Control get cache's lifetime.
