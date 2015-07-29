@@ -119,13 +119,13 @@ func (proxy *ProxyServer) HttpsHandler(rw http.ResponseWriter, req *http.Request
 
 func copyRemoteToClient(User string, Remote, Client net.Conn) {
     defer func() {
-        Client.Close()
         Remote.Close()
+        Client.Close()
     }()
 
     nr, err := io.Copy(Remote, Client)
     if err != nil && err != io.EOF {
-        log.Error("%v got an error when handles CONNECT %v\n", User, err)
+        //log.Error("%v got an error when handles CONNECT %v\n", User, err)
         return
     }
     log.Info("%v transport %v bytes betwwen %v and %v.\n", User, nr, Remote.RemoteAddr(), Client.RemoteAddr())
