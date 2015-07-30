@@ -1,15 +1,15 @@
 // Package proxy implements a http proxy.
 //
-// Support GET,POST,CONNECT method and so on.
+// Support GET, POST, CONNECT method and so on.
 // Support proxy auth and web management.
 // Support web cache.
 package proxy
 
 import (
+    "fmt"
     "io"
     "net"
     "net/http"
-    "strings"
     "time"
 )
 
@@ -33,30 +33,28 @@ func NewProxyServer() *http.Server {
 //ServeHTTP will be automatically called by system.
 //ProxyServer implements the Handler interface which need ServeHTTP.
 func (proxy *ProxyServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-    var err error
+    // defer func() {
+    //     if err := recover(); err != nil {
+    //         rw.WriteHeader(http.StatusInternalServerError)
+    //         log.Debug("Panic: %v\n", err)
+    //         fmt.Fprintf(rw, fmt.Sprintln(err))
+    //     }
+    // }()
+
+    fmt.Println("hello")
 
     log.Debug("Host := %v", req.URL.Host)
 
-    if cnfg.Reverse == false && cnfg.Auth == true { //代理服务器登入认证
-        if proxy.User, err = proxy.Auth(rw, req); err != nil {
-            log.Error("%v", err)
-            return
-        }
-    } else {
-        proxy.User = "Anonymous"
+    if proxy.Auth(rw, req) {
+        return
     }
 
-    if cnfg.Reverse == true { //用于反向代理
-        proxy.ReverseHandler(req)
+    proxy.ReverseHandler(req)
+
+    if proxy.Ban(rw, req) {
+        return
     }
 
-    for _, gfwlist := range cnfg.GFWList { //屏蔽列表，检查访问对象是否被屏蔽
-        if strings.Index(req.RequestURI, gfwlist) != -1 && gfwlist != "" {
-            log.Info("%s try to visit forbidden website %s", proxy.User, req.URL.Host)
-            http.Error(rw, "Forbid", 403)
-            return
-        }
-    }
     if req.Method == "CONNECT" {
         proxy.HttpsHandler(rw, req)
     } else if cnfg.Cache == true && req.Method == "GET" {
@@ -64,15 +62,6 @@ func (proxy *ProxyServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
     } else {
         proxy.HttpHandler(rw, req)
     }
-}
-
-//ReverseHandler handles request for reverse proxy.
-//处理反向代理请求
-func (proxy *ProxyServer) ReverseHandler(req *http.Request) {
-    req.Host = cnfg.Proxy_pass
-    req.URL.Host = req.Host
-    req.URL.Scheme = "http"
-    log.Debug("%v", req.RequestURI)
 }
 
 //HttpHandler handles http connections.
@@ -131,10 +120,14 @@ func (proxy *ProxyServer) HttpsHandler(rw http.ResponseWriter, req *http.Request
 }
 
 func copyRemoteToClient(User string, Remote, Client net.Conn) {
-    defer Client.Close()
+    defer func() {
+        Remote.Close()
+        Client.Close()
+    }()
+
     nr, err := io.Copy(Remote, Client)
     if err != nil && err != io.EOF {
-        log.Error("%v got an error when handles CONNECT %v\n", User, err)
+        //log.Error("%v got an error when handles CONNECT %v\n", User, err)
         return
     }
     log.Info("%v transport %v bytes betwwen %v and %v.\n", User, nr, Remote.RemoteAddr(), Client.RemoteAddr())

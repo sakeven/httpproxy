@@ -2,11 +2,9 @@ package proxy
 
 import (
     "github.com/op/go-logging"
-    "httpproxy/cache"
     "httpproxy/config"
 
     stdlog "log"
-    "os"
 )
 
 var log = logging.MustGetLogger("proxy")
@@ -32,12 +30,9 @@ func setLog() {
 }
 
 func init() {
-    Caches = make(map[cache.Checksum]*cache.Cache)
-    gopath := os.Getenv("GOPATH")
-    err := cnfg.GetConfig(gopath + "/src/httpproxy/config/config.json")
+    err := cnfg.GetConfig("config/config.json")
     if err != nil {
         stdlog.Fatal(err)
     }
     setLog()
-    go CheckCaches()
 }
