@@ -2,17 +2,16 @@
 package cache
 
 import (
-    "crypto/sha1"
-    "errors"
+    "io"
+    "io/ioutil"
     "net/http"
     "strings"
-    "sync"
     "time"
 )
 
 type Cache struct {
     Header        http.Header `json:"header"`
-    Body          string      `json:"body"`
+    Body          []byte      `json:"body"`
     StatusCode    int         `json:"status_code"`
     URI           string      `json:"url"`
     Last_Modified string      `json:"last_modified"` //eg:"Fri, 27 Jun 2014 07:19:49 GMT"
@@ -20,39 +19,32 @@ type Cache struct {
     Mustverified  bool        `json:"must_verified"`
     //Vlidity is a time when to verfiy the cache again.
     Vlidity time.Time `json:"vlidity"`
-    sync.Mutex
+    maxAge  int64     `json:"-"`
 }
 
-// Copyheaders copys headers from response headers.
-func (c *Cache) CopyHeaders(src http.Header) {
-    c.Lock()
-    defer c.Unlock()
-
+func New(resp *http.Response) *Cache {
+    c := new(Cache)
     c.Header = make(http.Header)
-    for key, values := range src {
-        for _, value := range values {
-            c.Header.Add(key, value)
-        }
-    }
-}
+    CopyHeaders(c.Header, resp.Header)
+    c.StatusCode = resp.StatusCode
 
-//SetCache sets a new cache.
-func (c *Cache) SetCache(StatusCode int, Body string) (err error) {
-    c.Lock()
-    defer c.Unlock()
-
-    c.StatusCode = StatusCode
-    c.Body = Body
+    var err error
+    c.Body, err = ioutil.ReadAll(resp.Body)
 
     if c.Header == nil {
-        return errors.New("try to access nil Header of a cache!")
+        return nil
     }
 
     c.ETag = c.Header.Get("ETag")
     c.Last_Modified = c.Header.Get("Last-Modified")
 
     Cache_Control := c.Header.Get("Cache-Control")
-    if strings.Index(Cache_Control, "no-cache") != -1 {
+
+    // no-cache means you should verify data before use cache.
+    // only use cache when remote server returns 302 status.
+    if strings.Index(Cache_Control, "no-cache") != -1 ||
+        strings.Index(Cache_Control, "must-revalidate") != -1 ||
+        strings.Index(Cache_Control, "proxy-revalidate") != -1 {
         c.Mustverified = true
         return nil
     }
@@ -60,9 +52,10 @@ func (c *Cache) SetCache(StatusCode int, Body string) (err error) {
     if Expires := c.Header.Get("Expires"); Expires != "" {
         c.Vlidity, err = time.Parse(http.TimeFormat, Expires)
         if err != nil {
-            return
+            return nil
         }
     }
+
     max_age := getAge(Cache_Control)
     if max_age != -1 {
         var Time time.Time
@@ -72,18 +65,17 @@ func (c *Cache) SetCache(StatusCode int, Body string) (err error) {
         } else {
             Time, err = time.Parse(time.RFC1123, date)
             if err != nil {
-                return
+                return nil
             }
         }
         c.Vlidity = Time.Add(time.Duration(max_age) * time.Second)
     }
-    return nil
+
+    return c
 }
 
 // Verify verifies whether cache is out of date.
 func (c *Cache) Verify() bool {
-    c.Lock()
-    defer c.Unlock()
 
     newReq, err := http.NewRequest("GET", c.URI, nil)
     if err != nil {
@@ -108,30 +100,28 @@ func (c *Cache) Verify() bool {
     return true
 }
 
-type Checksum [20]byte
-type CacheSet map[Checksum]*Cache
+// CacheHandler handles "Get" request
+func (c *Cache) WriteTo(rw http.ResponseWriter) {
 
-func getCheckSum(URI string) Checksum {
-    return sha1.Sum([]byte(URI))
+    CopyHeaders(rw.Header(), c.Header)
+    rw.WriteHeader(c.StatusCode)
+
+    _, err := rw.Write(c.Body)
+    if err != nil && err != io.EOF {
+        return
+    }
+
+    return
 }
 
-// GetCache finds specific cache dertermined by URI,if not Found nil will be return.
-func (c *CacheSet) GetCache(URI string) *Cache {
-    return (*c)[getCheckSum(URI)]
-}
-
-// Delete deletes specific cache.
-func (c *CacheSet) Delete(URI string) {
-    delete(*c, getCheckSum(URI))
-}
-func (c *CacheSet) DeleteByCheckSum(key Checksum) {
-    delete(*c, key)
-}
-
-// New returns a new cache.
-func (c *CacheSet) New(URI string) *Cache {
-    (*c)[getCheckSum(URI)].URI = URI
-    return (*c)[getCheckSum(URI)]
+// CopyHeaders copy headers from source to destination.
+// Nothing would be returned.
+func CopyHeaders(dst, src http.Header) {
+    for key, values := range src {
+        for _, value := range values {
+            dst.Add(key, value)
+        }
+    }
 }
 
 //getAge from Cache Control get cache's lifetime.

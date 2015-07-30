@@ -6,10 +6,10 @@ import (
 
 // CopyHeaders copy headers from source to destination.
 // Nothing would be returned.
-func CopyHeaders(dest, src http.Header) {
+func CopyHeaders(dst, src http.Header) {
     for key, values := range src {
         for _, value := range values {
-            dest.Add(key, value)
+            dst.Add(key, value)
         }
     }
 }
