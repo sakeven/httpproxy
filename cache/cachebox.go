@@ -2,9 +2,11 @@ package cache
 
 import (
     "encoding/json"
-    // "log"
+    "log"
     "net/http"
     "time"
+
+    "httpproxy/lib"
 
     "github.com/garyburd/redigo/redis"
 )
@@ -41,29 +43,32 @@ func NewCacheBox(address string, password string) *CacheBox {
     if err != nil {
         panic("Fail to connect to redis server")
     }
-
+    log.Println("yes to redis")
     return &CacheBox{
         pool: pool,
     }
 
 }
 
-func (c *CacheBox) Get(uri string) *Cache {
-    return c.get(uri)
+func (c *CacheBox) Get(uri string) lib.Cache {
+    log.Println("get cahche of ", uri)
+    if cache := c.get(uri); cache != nil {
+        //log.Println(*cache)
+        return cache
+    }
+    return nil
 }
 
 func (c *CacheBox) get(uri string) *Cache {
     conn := c.pool.Get()
     defer conn.Close()
 
-    values, err := redis.Values(conn.Do("GET", uri))
-
-    var b []byte
-    _, err = redis.Scan(values, &b)
-    if err != nil {
+    b, err := redis.Bytes(conn.Do("GET", uri))
+    if err != nil || len(b) == 0 {
+        log.Println(err)
         return nil
     }
-
+    log.Println(string(b))
     cache := new(Cache)
     json.Unmarshal(b, &cache)
     return cache
@@ -86,15 +91,21 @@ func (c *CacheBox) delete(uri string) {
     return
 }
 
-func (c *CacheBox) CheckAndStore(resp *http.Response) {
+func (c *CacheBox) CheckAndStore(uri string, resp *http.Response) {
     if !IsCache(resp) {
         return
     }
 
     cache := New(resp)
 
+    if cache == nil {
+        return
+    }
+
+    log.Println("store cache ", uri)
     b, err := json.Marshal(cache)
     if err != nil {
+        log.Println(err)
         return
     }
 
@@ -102,15 +113,17 @@ func (c *CacheBox) CheckAndStore(resp *http.Response) {
     defer conn.Close()
 
     conn.Send("MULTI")
-    conn.Send("SET", resp.Request.RequestURI, b)
-    conn.Send("EXPIRE", cache.StatusCode)
+    conn.Send("SET", uri, b)
+    conn.Send("EXPIRE", uri, cache.maxAge)
     _, err = conn.Do("EXEC")
     if err != nil {
+        log.Println(err)
         return
     }
+    log.Println("successfully store cache ", uri)
 
 }
 
-func (c *CacheBox) CheckAndDelete(d time.Duration) {
+func (c *CacheBox) Clear(d time.Duration) {
 
 }

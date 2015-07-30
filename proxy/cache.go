@@ -5,11 +5,13 @@ import (
     "io"
     "io/ioutil"
     "net/http"
+
+    "httpproxy/lib"
 )
 
-var cacheBox CacheBox
+var cacheBox lib.CacheBox
 
-func RegisterCacheBox(c CacheBox) {
+func RegisterCacheBox(c lib.CacheBox) {
     cacheBox = c
 }
 
@@ -22,9 +24,11 @@ func (proxy *ProxyServer) CacheHandler(rw http.ResponseWriter, req *http.Request
 
     if c != nil {
         if c.Verify() {
+            log.Debug("Get cache of %s", uri)
             c.WriteTo(rw)
             return
         } else {
+            log.Debug("Delete cache of %s", uri)
             cacheBox.Delete(uri)
         }
     }
@@ -41,7 +45,8 @@ func (proxy *ProxyServer) CacheHandler(rw http.ResponseWriter, req *http.Request
     *cresp = *resp
     CopyResponse(cresp, resp)
 
-    go cacheBox.CheckAndStore(cresp)
+    log.Debug("Check and store cache of %s", uri)
+    go cacheBox.CheckAndStore(uri, cresp)
 
     ClearHeaders(rw.Header())
     CopyHeaders(rw.Header(), resp.Header)

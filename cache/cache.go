@@ -2,8 +2,9 @@
 package cache
 
 import (
-    "io"
+    // "io"
     "io/ioutil"
+    "log"
     "net/http"
     "strings"
     "time"
@@ -54,6 +55,7 @@ func New(resp *http.Response) *Cache {
         if err != nil {
             return nil
         }
+        log.Println("expire:", c.Vlidity)
     }
 
     max_age := getAge(Cache_Control)
@@ -69,13 +71,21 @@ func New(resp *http.Response) *Cache {
             }
         }
         c.Vlidity = Time.Add(time.Duration(max_age) * time.Second)
+        c.maxAge = max_age
+    } else {
+        c.maxAge = 24 * 60 * 60
     }
+
+    log.Println("all:", c.Vlidity)
 
     return c
 }
 
 // Verify verifies whether cache is out of date.
 func (c *Cache) Verify() bool {
+    if c.Mustverified == false && c.Vlidity.After(time.Now().UTC()) {
+        return true
+    }
 
     newReq, err := http.NewRequest("GET", c.URI, nil)
     if err != nil {
@@ -101,17 +111,13 @@ func (c *Cache) Verify() bool {
 }
 
 // CacheHandler handles "Get" request
-func (c *Cache) WriteTo(rw http.ResponseWriter) {
+func (c *Cache) WriteTo(rw http.ResponseWriter) (int, error) {
 
     CopyHeaders(rw.Header(), c.Header)
     rw.WriteHeader(c.StatusCode)
 
-    _, err := rw.Write(c.Body)
-    if err != nil && err != io.EOF {
-        return
-    }
+    return rw.Write(c.Body)
 
-    return
 }
 
 // CopyHeaders copy headers from source to destination.

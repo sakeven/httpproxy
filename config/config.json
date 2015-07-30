@@ -3,7 +3,7 @@
 "reverse":false,
 "proxy_pass":"127.0.0.1:80",
 "auth":false,
-"cache":false,
+"cache":true,
 "cache_timeout":60,
 "log":1,
 "gfwlist":[],

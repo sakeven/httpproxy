@@ -1,4 +1,4 @@
-package proxy
+package lib
 
 import (
     "net/http"
@@ -8,8 +8,8 @@ import (
 type CacheBox interface {
     Get(uri string) Cache
     Delete(uri string)
-    CheckAndStore(resp *http.Response)
-    CheckAndDelete(d time.Duration)
+    CheckAndStore(uri string, resp *http.Response)
+    Clear(d time.Duration)
 }
 
 type Cache interface {
