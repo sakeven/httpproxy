@@ -8,7 +8,7 @@ import (
 //处理反向代理请求
 func (proxy *ProxyServer) ReverseHandler(req *http.Request) {
     if cnfg.Reverse == true { //用于反向代理
-        proxy.ReverseHandler(req)
+        proxy.reverseHandler(req)
     }
 }
 

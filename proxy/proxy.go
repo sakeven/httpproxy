@@ -33,17 +33,15 @@ func NewProxyServer() *http.Server {
 //ServeHTTP will be automatically called by system.
 //ProxyServer implements the Handler interface which need ServeHTTP.
 func (proxy *ProxyServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-    // defer func() {
-    //     if err := recover(); err != nil {
-    //         rw.WriteHeader(http.StatusInternalServerError)
-    //         log.Debug("Panic: %v\n", err)
-    //         fmt.Fprintf(rw, fmt.Sprintln(err))
-    //     }
-    // }()
+    defer func() {
+        if err := recover(); err != nil {
+            rw.WriteHeader(http.StatusInternalServerError)
+            log.Debug("Panic: %v\n", err)
+            fmt.Fprintf(rw, fmt.Sprintln(err))
+        }
+    }()
 
-    fmt.Println("hello")
-
-    log.Debug("Host := %v", req.URL.Host)
+    // log.Debug("Host := %v", req.URL.Host)
 
     if proxy.Auth(rw, req) {
         return
