@@ -11,6 +11,8 @@ import (
     "net"
     "net/http"
     "time"
+
+    "httpproxy/cache"
 )
 
 type ProxyServer struct {
@@ -21,9 +23,13 @@ type ProxyServer struct {
 
 // NewProxyServer returns a new proxyserver.
 func NewProxyServer() *http.Server {
+    if cnfg.Cache {
+        RegisterCacheBox(cache.NewCacheBox(":6379", ""))
+    }
+
     return &http.Server{
         Addr:           cnfg.Port,
-        Handler:        &ProxyServer{Tr: &http.Transport{Proxy: http.ProxyFromEnvironment}},
+        Handler:        &ProxyServer{Tr: &http.Transport{Proxy: http.ProxyFromEnvironment, DisableKeepAlives: true}},
         ReadTimeout:    10 * time.Second,
         WriteTimeout:   10 * time.Second,
         MaxHeaderBytes: 1 << 20,
