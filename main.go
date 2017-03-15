@@ -1,16 +1,17 @@
 package main
 
 import (
-    "httpproxy/proxy"
-    "log"
-    "net/http"
+	"log"
+	"net/http"
+
+	"httpproxy/proxy"
 )
 
 func main() {
-    pxy := proxy.NewProxyServer()
-    web := proxy.NewWebServer()
+	pxy := proxy.NewProxyServer()
+	web := proxy.NewWebServer()
 
-    go http.ListenAndServe(web.Port, web)
-    log.Println("begin proxy")
-    log.Fatal(pxy.ListenAndServe())
+	go http.ListenAndServe(web.Port, web)
+	log.Println("begin proxy")
+	log.Fatal(pxy.ListenAndServe())
 }
