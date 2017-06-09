@@ -1,7 +1,7 @@
 ## httpproxy
 * 基于golang开发，支持http/1.1以上版本的http代理。
 
-##细节功能：
+## 细节功能：
 * 支持内容缓存和重校验
 * 支持GET\POST\CONNECT等方法
 * 支持账号登入与验证
