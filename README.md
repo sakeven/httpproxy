@@ -1,4 +1,4 @@
-##httpproxy
+## httpproxy
 * 基于golang开发，支持http/1.1以上版本的http代理。
 
 ##细节功能：
@@ -9,10 +9,10 @@
 * 提供web版管理和调试界面
 * 支持反向代理
 
-##正在进行中
+## 正在进行中
 * 资源限定(各种超时，最大文件大小，最大缓存大小，最大头大小等，最大并发量，最大请求速度，最大传输速度等)
 
-##配置
+## 配置
   
 配置文件在config目录，采用json格式，包含
 
@@ -47,7 +47,7 @@
 
     /*this is a configure for proxy server. log: 1 for Information, 0 for DebugInfor*/
 
-##Build
+## Build
 * 在$GOPATH/src目录
 
         $ git clone git://code.csdn.net/sakeven/httpproxy.git
@@ -62,5 +62,5 @@
 
         $ ./httpproxy
 
-##Bug 
+## Bug 
 Contact with the author jc5930@sina.cn
