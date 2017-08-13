@@ -17,9 +17,9 @@ func (proxy *ProxyServer) Auth(rw http.ResponseWriter, req *http.Request) bool {
 			log.Debug("%v", err)
 			return true
 		}
-	} else {
-		proxy.User = "Anonymous"
 	}
+
+	proxy.User = "Anonymous"
 
 	return false
 }
@@ -34,6 +34,7 @@ func (proxy *ProxyServer) auth(rw http.ResponseWriter, req *http.Request) (strin
 		NeedAuth(rw, HTTP_407)
 		return "", errors.New("Need Proxy Authorization!")
 	}
+
 	data, err := base64.StdEncoding.DecodeString(auth)
 	if err != nil {
 		log.Debug("when decoding %v, got an error of %v", auth, err)
@@ -46,10 +47,11 @@ func (proxy *ProxyServer) auth(rw http.ResponseWriter, req *http.Request) (strin
 	if len(userPasswdPair) != 2 {
 		NeedAuth(rw, HTTP_407)
 		return "", errors.New("Fail to log in")
-	} else {
-		user = userPasswdPair[0]
-		passwd = userPasswdPair[1]
 	}
+
+	user = userPasswdPair[0]
+	passwd = userPasswdPair[1]
+
 	if Check(user, passwd) == false {
 		NeedAuth(rw, HTTP_407)
 		return "", errors.New("Fail to log in")
@@ -59,13 +61,13 @@ func (proxy *ProxyServer) auth(rw http.ResponseWriter, req *http.Request) (strin
 
 func NeedAuth(rw http.ResponseWriter, challenge []byte) error {
 	hj, _ := rw.(http.Hijacker)
-	Client, _, err := hj.Hijack()
+	client, _, err := hj.Hijack()
 	if err != nil {
 		return errors.New("Fail to get Tcp connection of Client")
 	}
-	defer Client.Close()
+	defer client.Close()
 
-	Client.Write(challenge)
+	client.Write(challenge)
 	return nil
 }
 
@@ -73,7 +75,6 @@ func NeedAuth(rw http.ResponseWriter, challenge []byte) error {
 func Check(user, passwd string) bool {
 	if user != "" && passwd != "" && cnfg.User[user] == passwd {
 		return true
-	} else {
-		return false
 	}
+	return false
 }

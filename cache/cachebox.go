@@ -13,7 +13,7 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
-func MD5Uri(uri string) string {
+func MD5URI(uri string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(uri)))
 }
 
@@ -58,18 +58,18 @@ func NewCacheBox(address string, password string) *CacheBox {
 
 func (c *CacheBox) Get(uri string) lib.Cache {
 	log.Println("get cahche of ", uri)
-	if cache := c.get(MD5Uri(uri)); cache != nil {
+	if cache := c.get(MD5URI(uri)); cache != nil {
 		//log.Println(*cache)
 		return cache
 	}
 	return nil
 }
 
-func (c *CacheBox) get(md5Uri string) *Cache {
+func (c *CacheBox) get(md5URI string) *Cache {
 	conn := c.pool.Get()
 	defer conn.Close()
 
-	b, err := redis.Bytes(conn.Do("GET", md5Uri))
+	b, err := redis.Bytes(conn.Do("GET", md5URI))
 	if err != nil || len(b) == 0 {
 		log.Println(err)
 		return nil
@@ -81,14 +81,14 @@ func (c *CacheBox) get(md5Uri string) *Cache {
 }
 
 func (c *CacheBox) Delete(uri string) {
-	c.delete(MD5Uri(uri))
+	c.delete(MD5URI(uri))
 }
 
-func (c *CacheBox) delete(md5Uri string) {
+func (c *CacheBox) delete(md5URI string) {
 	conn := c.pool.Get()
 	defer conn.Close()
 
-	_, err := conn.Do("DEL", md5Uri)
+	_, err := conn.Do("DEL", md5URI)
 
 	if err != nil {
 		return
@@ -110,7 +110,7 @@ func (c *CacheBox) CheckAndStore(uri string, resp *http.Response) {
 
 	log.Println("store cache ", uri)
 
-	md5Uri := MD5Uri(uri)
+	md5URI := MD5URI(uri)
 	b, err := json.Marshal(cache)
 	if err != nil {
 		log.Println(err)
@@ -121,8 +121,8 @@ func (c *CacheBox) CheckAndStore(uri string, resp *http.Response) {
 	defer conn.Close()
 
 	conn.Send("MULTI")
-	conn.Send("SET", md5Uri, b)
-	conn.Send("EXPIRE", md5Uri, cache.maxAge)
+	conn.Send("SET", md5URI, b)
+	conn.Send("EXPIRE", md5URI, cache.maxAge)
 	_, err = conn.Do("EXEC")
 	if err != nil {
 		log.Println(err)

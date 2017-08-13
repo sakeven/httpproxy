@@ -29,18 +29,18 @@ func (ws *WebServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	if req.URL.Path == "/" {
 		ws.HomeHandler(rw, req)
 		return
-	} else {
-		p := strings.Trim(req.URL.Path, "/")
-		s := strings.Split(p, "/")
-		switch s[0] {
-		case "static":
-			hadler := http.FileServer(http.Dir("."))
-			hadler.ServeHTTP(rw, req)
-		case "user":
-			ws.UserHandler(rw, req)
-		case "setting":
-			ws.SettingHandler(rw, req)
-		}
+	}
+
+	p := strings.Trim(req.URL.Path, "/")
+	s := strings.Split(p, "/")
+	switch s[0] {
+	case "static":
+		hadler := http.FileServer(http.Dir("."))
+		hadler.ServeHTTP(rw, req)
+	case "user":
+		ws.UserHandler(rw, req)
+	case "setting":
+		ws.SettingHandler(rw, req)
 	}
 }
 
@@ -185,10 +185,10 @@ func (ws *WebServer) WebAuth(rw http.ResponseWriter, req *http.Request) error {
 	if len(userPasswdPair) != 2 {
 		NeedAuth(rw, HTTP_401)
 		return errors.New(req.RemoteAddr + "Fail to log in")
-	} else {
-		user = userPasswdPair[0]
-		passwd = userPasswdPair[1]
 	}
+
+	user = userPasswdPair[0]
+	passwd = userPasswdPair[1]
 	if CheckAdmin(user, passwd) == false {
 		NeedAuth(rw, HTTP_401)
 		return errors.New(req.RemoteAddr + "Fail to log in")
@@ -202,7 +202,6 @@ var HTTP_401 = []byte("HTTP/1.1 401 Authorization Required\r\nWWW-Authenticate: 
 func CheckAdmin(user, passwd string) bool {
 	if user != "" && passwd != "" && cnfg.Admin[user] == passwd {
 		return true
-	} else {
-		return false
 	}
+	return false
 }

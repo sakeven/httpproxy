@@ -36,8 +36,8 @@ func NewProxyServer() *http.Server {
 	}
 }
 
-//ServeHTTP will be automatically called by system.
-//ProxyServer implements the Handler interface which need ServeHTTP.
+// ServeHTTP will be automatically called by system.
+// ProxyServer implements the Handler interface which need ServeHTTP.
 func (proxy *ProxyServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -60,17 +60,17 @@ func (proxy *ProxyServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if req.Method == "CONNECT" {
-		proxy.HttpsHandler(rw, req)
+		proxy.HTTPSHandler(rw, req)
 	} else if cnfg.Cache == true && req.Method == "GET" {
 		proxy.CacheHandler(rw, req)
 	} else {
-		proxy.HttpHandler(rw, req)
+		proxy.HTTPHandler(rw, req)
 	}
 }
 
-//HttpHandler handles http connections.
-//处理普通的http请求
-func (proxy *ProxyServer) HttpHandler(rw http.ResponseWriter, req *http.Request) {
+// HTTPHandler handles http connections.
+// 处理普通的http请求
+func (proxy *ProxyServer) HTTPHandler(rw http.ResponseWriter, req *http.Request) {
 	log.Info("%v is sending request %v %v \n", proxy.User, req.Method, req.URL.Host)
 	RmProxyHeaders(req)
 
@@ -89,7 +89,7 @@ func (proxy *ProxyServer) HttpHandler(rw http.ResponseWriter, req *http.Request)
 
 	nr, err := io.Copy(rw, resp.Body)
 	if err != nil && err != io.EOF {
-		log.Error("%v got an error when copy remote response to client.%v\n", proxy.User, err)
+		log.Error("%v got an error when copy remote response to client. %v\n", proxy.User, err)
 		return
 	}
 	log.Info("%v copied %v bytes from %v.\n", proxy.User, nr, req.URL.Host)
@@ -97,15 +97,15 @@ func (proxy *ProxyServer) HttpHandler(rw http.ResponseWriter, req *http.Request)
 
 var HTTP_200 = []byte("HTTP/1.1 200 Connection Established\r\n\r\n")
 
-// HttpsHandler handles any connection which need connect method.
+// HTTPSHandler handles any connection which need connect method.
 // 处理https连接，主要用于CONNECT方法
-func (proxy *ProxyServer) HttpsHandler(rw http.ResponseWriter, req *http.Request) {
+func (proxy *ProxyServer) HTTPSHandler(rw http.ResponseWriter, req *http.Request) {
 	log.Info("%v tried to connect to %v", proxy.User, req.URL.Host)
 
 	hj, _ := rw.(http.Hijacker)
 	client, _, err := hj.Hijack() //获取客户端与代理服务器的tcp连接
 	if err != nil {
-		log.Error("%v failed to get Tcp connection of \n", proxy.User, req.RequestURI)
+		log.Error("%v failed to get Tcp connection of %s \n", proxy.User, req.RequestURI)
 		http.Error(rw, "Failed", http.StatusBadRequest)
 		return
 	}
