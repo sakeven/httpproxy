@@ -24,12 +24,12 @@ func (proxy *ProxyServer) CacheHandler(rw http.ResponseWriter, req *http.Request
 
 	if c != nil {
 		if c.Verify() {
-			log.Debug("Get cache of %s", uri)
+			log.Debugf("Get cache of %s", uri)
 			c.WriteTo(rw)
 			return
 		}
 
-		log.Debug("Delete cache of %s", uri)
+		log.Debugf("Delete cache of %s", uri)
 		cacheBox.Delete(uri)
 	}
 
@@ -45,7 +45,7 @@ func (proxy *ProxyServer) CacheHandler(rw http.ResponseWriter, req *http.Request
 	*cresp = *resp
 	CopyResponse(cresp, resp)
 
-	log.Debug("Check and store cache of %s", uri)
+	log.Debugf("Check and store cache of %s", uri)
 	go cacheBox.CheckAndStore(uri, cresp)
 
 	ClearHeaders(rw.Header())
@@ -58,7 +58,7 @@ func (proxy *ProxyServer) CacheHandler(rw http.ResponseWriter, req *http.Request
 		log.Errorf("%v got an error when copy remote response to client. %v\n", proxy.User, err)
 		return
 	}
-	log.Info("%v Copied %v bytes from %v.\n", proxy.User, nr, req.URL.Host)
+	log.Infof("%v Copied %v bytes from %v.\n", proxy.User, nr, req.URL.Host)
 }
 
 func CopyResponse(dest *http.Response, src *http.Response) {

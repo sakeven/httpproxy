@@ -1,12 +1,10 @@
-FROM golang:1.7
-MAINTAINER Sakeven Jiang "jc5930@sina.cn"
+FROM golang:1.8
+MAINTAINER Sakeven Jiang "sakeven.jiang@gmail.com"
 
 # Build app
-ADD . $GOPATH/src/httpproxy
-WORKDIR $GOPATH/src/httpproxy
+COPY . $GOPATH/src/github.com/sakeven/httpproxy
 
-RUN go get -t httpproxy
-RUN go build httpproxy
-
+RUN go install github.com/sakeven/httpproxy
 EXPOSE 8080
-CMD ["$GOPATH/src/httpproxy/httpproxy"]
+
+CMD ["httpproxy"]
