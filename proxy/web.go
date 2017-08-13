@@ -22,7 +22,7 @@ func NewWebServer() *WebServer {
 // ServeHTTP handles web admin pages
 func (ws *WebServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	if err := ws.WebAuth(rw, req); err != nil {
-		log.Debug("%v", err)
+		log.Debugf("%v", err)
 		return
 	}
 
@@ -54,14 +54,14 @@ func (ws *WebServer) HomeHandler(rw http.ResponseWriter, req *http.Request) {
 	t := template.New("layout.tpl")
 	t, err := t.ParseFiles("views/layout.tpl", "views/home.tpl")
 	if err != nil {
-		log.Error("%v", err)
+		log.Errorf("%v", err)
 		http.Error(rw, "tpl error", 500)
 		return
 	}
 	Data := data{cnfg, "home"}
 	err = t.Execute(rw, Data)
 	if err != nil {
-		log.Error("%v", err)
+		log.Errorf("%v", err)
 		http.Error(rw, "tpl error", 500)
 		return
 	}
@@ -82,14 +82,14 @@ func (ws *WebServer) UserHandler(rw http.ResponseWriter, req *http.Request) {
 		t := template.New("layout.tpl")
 		t, err := t.ParseFiles("views/layout.tpl", "views/user.tpl")
 		if err != nil {
-			log.Error("%v", err)
+			log.Errorf("%v", err)
 			http.Error(rw, "tpl error", 500)
 			return
 		}
 		Data := data{cnfg, "user"}
 		err = t.Execute(rw, Data)
 		if err != nil {
-			log.Error("%v", err)
+			log.Errorf("%v", err)
 			http.Error(rw, "tpl error", 500)
 			return
 		}
@@ -111,7 +111,7 @@ func (ws *WebServer) UserHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 	err := cnfg.WriteToFile("config/config.json")
 	if err != nil {
-		log.Error("%v", err)
+		log.Errorf("%v", err)
 	}
 }
 
@@ -128,14 +128,14 @@ func (ws *WebServer) SettingHandler(rw http.ResponseWriter, req *http.Request) {
 		t := template.New("layout.tpl")
 		t, err := t.ParseFiles("views/layout.tpl", "views/setting.tpl")
 		if err != nil {
-			log.Error("%v", err)
+			log.Errorf("%v", err)
 			http.Error(rw, "tpl error", 500)
 			return
 		}
 		Data := data{cnfg, "setting"}
 		err = t.Execute(rw, Data)
 		if err != nil {
-			log.Error("%v", err)
+			log.Errorf("%v", err)
 			http.Error(rw, "tpl error", 500)
 			return
 		}
@@ -157,7 +157,7 @@ func (ws *WebServer) SettingHandler(rw http.ResponseWriter, req *http.Request) {
 		gfwlist = strings.Trim(gfwlist, ";")
 		cnfg.GFWList = strings.Split(gfwlist, ";")
 		err := cnfg.WriteToFile("config/config.json")
-		log.Error("%v", err)
+		log.Errorf("%v", err)
 		log.Debug("herre")
 		rw.WriteHeader(http.StatusOK)
 	}
@@ -170,12 +170,12 @@ func (ws *WebServer) WebAuth(rw http.ResponseWriter, req *http.Request) error {
 
 	if auth == "" {
 		err := NeedAuth(rw, HTTP_401)
-		log.Debug("%v", err)
+		log.Debugf("%v", err)
 		return errors.New("Need Authorization!")
 	}
 	data, err := base64.StdEncoding.DecodeString(auth)
 	if err != nil {
-		log.Debug("when decoding %v, got an error of %v", auth, err)
+		log.Debugf("when decoding %v, got an error of %v", auth, err)
 		return errors.New("Fail to decoding WWWW-Authorization")
 	}
 

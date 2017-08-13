@@ -18,5 +18,5 @@ func (proxy *ProxyServer) reverseHandler(req *http.Request) {
 	req.Host = cnfg.Proxy_pass
 	req.URL.Host = req.Host
 	req.URL.Scheme = "http"
-	log.Debug("%v", req.RequestURI)
+	log.Debugf("%v", req.RequestURI)
 }

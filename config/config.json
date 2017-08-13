@@ -5,7 +5,7 @@
 "auth":false,
 "cache":false,
 "cache_timeout":60,
-"log":1,
+"log":0,
 "gfwlist":[],
 "admin":{"Admin":"prxy"},
 "user":{"proxy":"proxy"}}

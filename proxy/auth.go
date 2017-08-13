@@ -14,7 +14,7 @@ func (proxy *ProxyServer) Auth(rw http.ResponseWriter, req *http.Request) bool {
 	var err error
 	if cnfg.Reverse == false && cnfg.Auth == true { //代理服务器登入认证
 		if proxy.User, err = proxy.auth(rw, req); err != nil {
-			log.Debug("%v", err)
+			log.Debugf("%v", err)
 			return true
 		}
 	}

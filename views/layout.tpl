@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>Http Proxy Web</title>
+	<title>HTTP Proxy Web</title>
 	 <link href="/static/css/main.css" rel="stylesheet" type="text/css" />
 	 <script src="/static/js/jquery.min.js" type="text/javascript"></script>
     <script src="/static/js/action.js" type="text/javascript"></script>
@@ -10,7 +10,7 @@
 <body>
  	<div class="container">
  		<div id="pageHeader">
-		<h1>Http Proxy Web</h1> 		
+		<h1>HTTP Proxy Web</h1>
  		</div>
 
     <div id="navibar" class="span-3 last">

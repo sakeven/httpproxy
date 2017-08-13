@@ -55,7 +55,7 @@ func (proxy *ProxyServer) CacheHandler(rw http.ResponseWriter, req *http.Request
 
 	nr, err := io.Copy(rw, resp.Body)
 	if err != nil && err != io.EOF {
-		log.Error("%v got an error when copy remote response to client. %v\n", proxy.User, err)
+		log.Errorf("%v got an error when copy remote response to client. %v\n", proxy.User, err)
 		return
 	}
 	log.Info("%v Copied %v bytes from %v.\n", proxy.User, nr, req.URL.Host)

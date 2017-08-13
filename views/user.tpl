@@ -13,7 +13,7 @@
 		{{range $user,$passwd :=.}}
 		<tr>
 			<td>{{$user}}</td>
-			<td><input type="text" id="passwd{{$user}}" name="passwd" value="{{$passwd}}" required /></td>
+			<td><input type="password" id="passwd{{$user}}" name="passwd" value="{{$passwd}}" required /></td>
 			<td><select name="action" data-id="{{$user}}">
 			<option selected value="">无</option>
 			<option value="delete">删除</option>
