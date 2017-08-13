@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"httpproxy/lib"
+	"github.com/sakeven/httpproxy/lib"
 )
 
 var cacheBox lib.CacheBox

@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"httpproxy/config"
+	"github.com/sakeven/httpproxy/config"
 )
 
 type WebServer struct {

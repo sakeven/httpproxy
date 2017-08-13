@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"time"
 
-	"httpproxy/cache"
+	"github.com/sakeven/httpproxy/cache"
 )
 
 type ProxyServer struct {

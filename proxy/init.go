@@ -1,10 +1,11 @@
 package proxy
 
 import (
-	"github.com/op/go-logging"
-	"httpproxy/config"
+	logging "github.com/op/go-logging"
 
 	stdlog "log"
+
+	"github.com/sakeven/httpproxy/config"
 )
 
 var log = logging.MustGetLogger("proxy")

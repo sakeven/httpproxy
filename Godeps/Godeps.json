@@ -1,0 +1,22 @@
+{
+	"ImportPath": "github.com/sakeven/httpproxy",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Comment": "v1.1.0-8-g9e66b83",
+			"Rev": "9e66b83d15a259978be267d0b61838c42c3904e3"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Comment": "v1.1.0-8-g9e66b83",
+			"Rev": "9e66b83d15a259978be267d0b61838c42c3904e3"
+		},
+		{
+			"ImportPath": "github.com/op/go-logging",
+			"Comment": "v1-7-g970db52",
+			"Rev": "970db520ece77730c7e4724c61121037378659d9"
+		}
+	]
+}

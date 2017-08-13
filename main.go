@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"httpproxy/proxy"
+	"github.com/sakeven/httpproxy/proxy"
 )
 
 func main() {

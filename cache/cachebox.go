@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"httpproxy/lib"
+	"github.com/sakeven/httpproxy/lib"
 
 	"github.com/garyburd/redigo/redis"
 )
