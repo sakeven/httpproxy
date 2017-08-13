@@ -1,5 +1,5 @@
 //Package cache handlers http web cache.
-package cache
+package redis
 
 import (
 	// "io"
@@ -15,12 +15,12 @@ type Cache struct {
 	Body         []byte      `json:"body"`
 	StatusCode   int         `json:"status_code"`
 	URI          string      `json:"url"`
-	LastModified string      `json:"last_modified"` //eg:"Fri, 27 Jun 2014 07:19:49 GMT"
+	LastModified string      `json:"last_modified"` // eg:"Fri, 27 Jun 2014 07:19:49 GMT"
 	ETag         string      `json:"etag"`
 	Mustverified bool        `json:"must_verified"`
-	//Vlidity is a time when to verfiy the cache again.
-	Vlidity time.Time `json:"vlidity"`
-	maxAge  int64
+	// Validity is a time when to verfiy the cache again.
+	Validity time.Time `json:"validity"`
+	maxAge   int64
 }
 
 func New(resp *http.Response) *Cache {
@@ -51,11 +51,11 @@ func New(resp *http.Response) *Cache {
 	}
 
 	if Expires := c.Header.Get("Expires"); Expires != "" {
-		c.Vlidity, err = time.Parse(http.TimeFormat, Expires)
+		c.Validity, err = time.Parse(http.TimeFormat, Expires)
 		if err != nil {
 			return nil
 		}
-		log.Println("expire:", c.Vlidity)
+		log.Println("expire:", c.Validity)
 	}
 
 	maxAge := getAge(cacheControl)
@@ -70,20 +70,20 @@ func New(resp *http.Response) *Cache {
 				return nil
 			}
 		}
-		c.Vlidity = Time.Add(time.Duration(maxAge) * time.Second)
+		c.Validity = Time.Add(time.Duration(maxAge) * time.Second)
 		c.maxAge = maxAge
 	} else {
 		c.maxAge = 24 * 60 * 60
 	}
 
-	log.Println("all:", c.Vlidity)
+	log.Println("all:", c.Validity)
 
 	return c
 }
 
 // Verify verifies whether cache is out of date.
 func (c *Cache) Verify() bool {
-	if c.Mustverified == false && c.Vlidity.After(time.Now().UTC()) {
+	if c.Mustverified == false && c.Validity.After(time.Now().UTC()) {
 		return true
 	}
 

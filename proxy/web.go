@@ -171,12 +171,12 @@ func (ws *WebServer) WebAuth(rw http.ResponseWriter, req *http.Request) error {
 	if auth == "" {
 		err := NeedAuth(rw, HTTP_401)
 		log.Debugf("%v", err)
-		return errors.New("Need Authorization!")
+		return errors.New("need authorization")
 	}
 	data, err := base64.StdEncoding.DecodeString(auth)
 	if err != nil {
 		log.Debugf("when decoding %v, got an error of %v", auth, err)
-		return errors.New("Fail to decoding WWWW-Authorization")
+		return errors.New("failed to decoding WWWW-Authorization")
 	}
 
 	var user, passwd string
@@ -198,7 +198,7 @@ func (ws *WebServer) WebAuth(rw http.ResponseWriter, req *http.Request) error {
 
 var HTTP_401 = []byte("HTTP/1.1 401 Authorization Required\r\nWWW-Authenticate: Basic realm=\"Secure Web\"\r\n\r\n")
 
-//CheckAdmin
+// CheckAdmin
 func CheckAdmin(user, passwd string) bool {
 	if user != "" && passwd != "" && cnfg.Admin[user] == passwd {
 		return true

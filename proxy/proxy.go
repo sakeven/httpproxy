@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sakeven/httpproxy/cache"
+	"github.com/sakeven/httpproxy/cache/redis"
 )
 
 type ProxyServer struct {
@@ -24,7 +24,7 @@ type ProxyServer struct {
 // NewProxyServer returns a new proxyserver.
 func NewProxyServer() *http.Server {
 	if cnfg.Cache {
-		RegisterCacheBox(cache.NewCacheBox(":6379", ""))
+		redis.Register(":6379", "")
 	}
 
 	return &http.Server{

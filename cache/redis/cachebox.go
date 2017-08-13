@@ -1,4 +1,4 @@
-package cache
+package redis
 
 import (
 	"crypto/md5"
@@ -8,9 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sakeven/httpproxy/lib"
-
 	"github.com/garyburd/redigo/redis"
+	cache "github.com/sakeven/httpproxy/cache"
 )
 
 func MD5URI(uri string) string {
@@ -49,14 +48,13 @@ func NewCacheBox(address string, password string) *CacheBox {
 	if err != nil {
 		panic("Fail to connect to redis server")
 	}
-	log.Println("yes to redis")
 	return &CacheBox{
 		pool: pool,
 	}
 
 }
 
-func (c *CacheBox) Get(uri string) lib.Cache {
+func (c *CacheBox) Get(uri string) cache.Cache {
 	log.Println("get cahche of ", uri)
 	if cache := c.get(MD5URI(uri)); cache != nil {
 		//log.Println(*cache)
@@ -71,10 +69,8 @@ func (c *CacheBox) get(md5URI string) *Cache {
 
 	b, err := redis.Bytes(conn.Do("GET", md5URI))
 	if err != nil || len(b) == 0 {
-		log.Println(err)
 		return nil
 	}
-	log.Println(string(b))
 	cache := new(Cache)
 	json.Unmarshal(b, &cache)
 	return cache
@@ -125,7 +121,6 @@ func (c *CacheBox) CheckAndStore(uri string, resp *http.Response) {
 	conn.Send("EXPIRE", md5URI, cache.maxAge)
 	_, err = conn.Do("EXEC")
 	if err != nil {
-		log.Println(err)
 		return
 	}
 	log.Println("successfully store cache ", uri)

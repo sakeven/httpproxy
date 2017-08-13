@@ -6,22 +6,15 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/sakeven/httpproxy/lib"
+	cacheBox "github.com/sakeven/httpproxy/cache"
 )
 
-var cacheBox lib.CacheBox
-
-func RegisterCacheBox(c lib.CacheBox) {
-	cacheBox = c
-}
-
-//CacheHandler handles "Get" request
+// CacheHandler handles "Get" request
 func (proxy *ProxyServer) CacheHandler(rw http.ResponseWriter, req *http.Request) {
 
 	var uri = req.RequestURI
 
 	c := cacheBox.Get(uri)
-
 	if c != nil {
 		if c.Verify() {
 			log.Debugf("Get cache of %s", uri)

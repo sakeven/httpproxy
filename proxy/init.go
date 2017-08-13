@@ -11,7 +11,7 @@ import (
 var log = logging.MustGetLogger("proxy")
 var cnfg config.Config
 
-//setLog() sets log output format.
+// setLog sets log output format.
 func setLog() {
 	var level logging.Level
 	if cnfg.Log == 1 {
