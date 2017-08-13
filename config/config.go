@@ -4,8 +4,9 @@ package config
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"os"
-	"strings"
+	"path/filepath"
 )
 
 // Config 保存代理服务器的配置
@@ -20,7 +21,7 @@ type Config struct {
 	Reverse bool `json:"reverse"`
 
 	// 反向代理目标地址,eg:"127.0.0.1:8090"
-	Proxy_pass string `json:"proxy_pass"`
+	ProxyPass string `json:"proxy_pass"`
 
 	// 认证标志
 	Auth bool `json:"auth"`
@@ -43,44 +44,85 @@ type Config struct {
 	User map[string]string `json:"user"`
 }
 
+var configFile = os.Getenv("HOME") + "/.httpproxy/config.json"
+
+func isExist(filename string) bool {
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		fmt.Printf("file does not exist")
+		return false
+	}
+	return true
+}
+
+func createDefaultConfig() {
+	err := os.MkdirAll(filepath.Dir(configFile), os.ModePerm)
+	if err != nil {
+		panic(fmt.Sprintf("create dir %s failed", filepath.Dir(configFile)))
+	}
+
+	file, err := os.Create(configFile)
+	if err != nil {
+		panic(fmt.Sprintf("open %s failed", configFile))
+	}
+	defer file.Close()
+
+	file.Write([]byte(defaultConfig))
+}
+
 // GetConfig gets config from json file.
 // GetConfig 从指定json文件读取config配置
-func (c *Config) GetConfig(filename string) error {
+func (c *Config) GetConfig() error {
+	if isExist(configFile) == false {
+		createDefaultConfig()
+	}
+
 	c.Admin = make(map[string]string)
 	c.User = make(map[string]string)
 
-	configFile, err := os.Open(filename)
+	file, err := os.Open(configFile)
 	if err != nil {
 		return err
 	}
-	defer configFile.Close()
+	defer file.Close()
 
-	br := bufio.NewReader(configFile)
-	err = json.NewDecoder(br).Decode(c)
-	if err != nil {
-		return err
-	}
-	return nil
+	br := bufio.NewReader(file)
+	return json.NewDecoder(br).Decode(c)
 }
 
-// WriteTOFile writes config into json file.
+// WriteToFile writes config into json file.
 // WriteToFile 将config配置写入特定json文件
-func (c *Config) WriteToFile(filename string) error {
-	configFile, err := os.OpenFile(filename, os.O_WRONLY|os.O_TRUNC, os.ModePerm)
+func (c *Config) WriteToFile() error {
+	file, err := os.OpenFile(configFile, os.O_WRONLY|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		return err
 	}
-	defer configFile.Close()
+	defer file.Close()
 
-	b, err := json.Marshal(c)
+	b, err := json.MarshalIndent(c, "", "\t")
 	if err != nil {
 		return err
 	}
-	cjson := string(b)
-	cspilts := strings.Split(cjson, ",")
-	cjson = strings.Join(cspilts, ",\n")
-
-	configFile.Write([]byte(cjson))
-
-	return nil
+	_, err = file.Write(b)
+	return err
 }
+
+const defaultConfig = `
+{
+    "port": ":8080",
+    "webport": ":6060",
+    "reverse": false,
+    "proxy_pass": "127.0.0.1:80",
+    "auth": false,
+    "cache": false,
+    "cache_timeout": 60,
+    "log": 0,
+    "gfwlist": [
+    ],
+    "admin": {
+        "Admin": "prxy"
+    },
+    "user": {
+        "proxy": "proxy"
+    }
+}
+`

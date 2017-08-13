@@ -14,7 +14,7 @@
 	<div id="field">
 	<label for="auth">反向代理目标地址</label><span> eg:"127.0.0.1:8090"</span>
 	<br />
-	<input type="text" id="proxy_pass" name="proxy_pass" value="{{.Proxy_pass}}" size="30" />
+	<input type="text" id="proxy_pass" name="proxy_pass" value="{{.ProxyPass}}" size="30" />
 	</div>
 	<div id="field">
 	<label for="auth">是否开启认证</label><span> [true/false]</span>

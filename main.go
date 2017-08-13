@@ -12,6 +12,6 @@ func main() {
 	web := proxy.NewWebServer()
 
 	go http.ListenAndServe(web.Port, web)
-	log.Println("begin proxy")
+	log.Println("Begin proxy")
 	log.Fatal(pxy.ListenAndServe())
 }

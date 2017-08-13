@@ -25,7 +25,7 @@ func ProxyClient() (*http.Client, *httptest.Server) {
 	return client, s
 }
 
-func TestProxyUrl(t *testing.T) {
+func TestProxyURL(t *testing.T) {
 	client, s := ProxyClient()
 	defer s.Close()
 

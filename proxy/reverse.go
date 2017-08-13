@@ -15,7 +15,7 @@ func (proxy *ProxyServer) ReverseHandler(req *http.Request) {
 //ReverseHandler handles request for reverse proxy.
 //处理反向代理请求
 func (proxy *ProxyServer) reverseHandler(req *http.Request) {
-	req.Host = cnfg.Proxy_pass
+	req.Host = cnfg.ProxyPass
 	req.URL.Host = req.Host
 	req.URL.Scheme = "http"
 	log.Debugf("%v", req.RequestURI)

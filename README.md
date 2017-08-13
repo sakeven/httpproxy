@@ -14,7 +14,7 @@
 
 ## 配置
   
-配置文件在 config 目录，采用 JSON 格式，包含
+配置文件在 $HOME/.httproxy/config.json，采用 JSON 格式，包含
 
 * port：代理服务器工作端口
 * webport：代理服务器 web 管理端口

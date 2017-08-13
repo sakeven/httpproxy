@@ -31,7 +31,7 @@ func setLog() {
 }
 
 func init() {
-	err := cnfg.GetConfig("config/config.json")
+	err := cnfg.GetConfig()
 	if err != nil {
 		stdlog.Fatal(err)
 	}
