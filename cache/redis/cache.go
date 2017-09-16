@@ -87,7 +87,7 @@ func (c *Cache) Verify() bool {
 		return true
 	}
 
-	newReq, err := http.NewRequest("GET", c.URI, nil)
+	newReq, err := http.NewRequest("HEAD", c.URI, nil)
 	if err != nil {
 		return false
 	}
