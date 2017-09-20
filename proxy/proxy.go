@@ -15,21 +15,22 @@ import (
 	"github.com/sakeven/httpproxy/cache/redis"
 )
 
-type ProxyServer struct {
+// Server is a server of proxy.
+type Server struct {
 	// User records user's name
 	Tr   *http.Transport
 	User string
 }
 
-// NewProxyServer returns a new proxyserver.
-func NewProxyServer() *http.Server {
+// NewServer returns a new proxyserver.
+func NewServer() *http.Server {
 	if cnfg.Cache {
 		redis.Register(":6379", "")
 	}
 
 	return &http.Server{
 		Addr:           cnfg.Port,
-		Handler:        &ProxyServer{Tr: &http.Transport{Proxy: http.ProxyFromEnvironment, DisableKeepAlives: true}},
+		Handler:        &Server{Tr: &http.Transport{Proxy: http.ProxyFromEnvironment, DisableKeepAlives: true}},
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
@@ -38,7 +39,7 @@ func NewProxyServer() *http.Server {
 
 // ServeHTTP will be automatically called by system.
 // ProxyServer implements the Handler interface which need ServeHTTP.
-func (proxy *ProxyServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+func (proxy *Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	defer func() {
 		if err := recover(); err != nil {
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -70,7 +71,7 @@ func (proxy *ProxyServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 // HTTPHandler handles http connections.
 // 处理普通的http请求
-func (proxy *ProxyServer) HTTPHandler(rw http.ResponseWriter, req *http.Request) {
+func (proxy *Server) HTTPHandler(rw http.ResponseWriter, req *http.Request) {
 	log.Infof("%v is sending request %v %v \n", proxy.User, req.Method, req.URL.Host)
 	RmProxyHeaders(req)
 
@@ -95,11 +96,12 @@ func (proxy *ProxyServer) HTTPHandler(rw http.ResponseWriter, req *http.Request)
 	log.Infof("%v copied %v bytes from %v.\n", proxy.User, nr, req.URL.Host)
 }
 
-var HTTP_200 = []byte("HTTP/1.1 200 Connection Established\r\n\r\n")
+// HTTP200 http 200 response
+var HTTP200 = []byte("HTTP/1.1 200 Connection Established\r\n\r\n")
 
 // HTTPSHandler handles any connection which need connect method.
 // 处理https连接，主要用于CONNECT方法
-func (proxy *ProxyServer) HTTPSHandler(rw http.ResponseWriter, req *http.Request) {
+func (proxy *Server) HTTPSHandler(rw http.ResponseWriter, req *http.Request) {
 	log.Infof("%v tried to connect to %v", proxy.User, req.URL.Host)
 
 	hj, _ := rw.(http.Hijacker)
@@ -118,7 +120,7 @@ func (proxy *ProxyServer) HTTPSHandler(rw http.ResponseWriter, req *http.Request
 		return
 	}
 
-	client.Write(HTTP_200)
+	client.Write(HTTP200)
 
 	go copyRemoteToClient(proxy.User, remote, client)
 	go copyRemoteToClient(proxy.User, client, remote)

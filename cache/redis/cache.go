@@ -1,4 +1,4 @@
-//Package cache handlers http web cache.
+//Package redis handlers http web cache.
 package redis
 
 import (
@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// Cache is an item of redis cache
 type Cache struct {
 	Header       http.Header `json:"header"`
 	Body         []byte      `json:"body"`
@@ -23,6 +24,7 @@ type Cache struct {
 	maxAge   int64
 }
 
+// New creates a new redis cahce.
 func New(resp *http.Response) *Cache {
 	c := new(Cache)
 	c.Header = make(http.Header)

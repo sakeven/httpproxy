@@ -11,10 +11,12 @@ import (
 	"github.com/sakeven/httpproxy/config"
 )
 
+// WebServer is a manager server
 type WebServer struct {
 	Port string
 }
 
+// NewWebServer creates a WebServer to manage.
 func NewWebServer() *WebServer {
 	return &WebServer{Port: cnfg.WebPort}
 }
@@ -163,13 +165,13 @@ func (ws *WebServer) SettingHandler(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// WebAuth
+// WebAuth performance authorization.
 func (ws *WebServer) WebAuth(rw http.ResponseWriter, req *http.Request) error {
 	auth := req.Header.Get("Authorization")
 	auth = strings.Replace(auth, "Basic ", "", 1)
 
 	if auth == "" {
-		err := NeedAuth(rw, HTTP_401)
+		err := NeedAuth(rw, HTTP401)
 		log.Debugf("%v", err)
 		return errors.New("need authorization")
 	}
@@ -183,22 +185,23 @@ func (ws *WebServer) WebAuth(rw http.ResponseWriter, req *http.Request) error {
 
 	userPasswdPair := strings.Split(string(data), ":")
 	if len(userPasswdPair) != 2 {
-		NeedAuth(rw, HTTP_401)
+		NeedAuth(rw, HTTP401)
 		return errors.New(req.RemoteAddr + "Fail to log in")
 	}
 
 	user = userPasswdPair[0]
 	passwd = userPasswdPair[1]
 	if CheckAdmin(user, passwd) == false {
-		NeedAuth(rw, HTTP_401)
+		NeedAuth(rw, HTTP401)
 		return errors.New(req.RemoteAddr + "Fail to log in")
 	}
 	return nil
 }
 
-var HTTP_401 = []byte("HTTP/1.1 401 Authorization Required\r\nWWW-Authenticate: Basic realm=\"Secure Web\"\r\n\r\n")
+// HTTP401 http 401 response
+var HTTP401 = []byte("HTTP/1.1 401 Authorization Required\r\nWWW-Authenticate: Basic realm=\"Secure Web\"\r\n\r\n")
 
-// CheckAdmin
+// CheckAdmin checks authorization
 func CheckAdmin(user, passwd string) bool {
 	if user != "" && passwd != "" && cnfg.Admin[user] == passwd {
 		return true

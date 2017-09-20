@@ -17,7 +17,7 @@ func init() {
 }
 
 func ProxyClient() (*http.Client, *httptest.Server) {
-	proxy := NewProxyServer()
+	proxy := NewServer()
 	s := httptest.NewServer(proxy.Handler)
 
 	proxyURL, _ := url.Parse(s.URL)

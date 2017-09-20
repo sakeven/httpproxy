@@ -10,7 +10,7 @@ import (
 )
 
 // CacheHandler handles "Get" request
-func (proxy *ProxyServer) CacheHandler(rw http.ResponseWriter, req *http.Request) {
+func (proxy *Server) CacheHandler(rw http.ResponseWriter, req *http.Request) {
 
 	var uri = req.RequestURI
 
@@ -54,8 +54,8 @@ func (proxy *ProxyServer) CacheHandler(rw http.ResponseWriter, req *http.Request
 	log.Infof("%v Copied %v bytes from %v.\n", proxy.User, nr, req.URL.Host)
 }
 
+// CopyResponse copys  response from src to dest.
 func CopyResponse(dest *http.Response, src *http.Response) {
-
 	*dest = *src
 	var bodyBytes []byte
 

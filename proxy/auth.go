@@ -7,10 +7,11 @@ import (
 	"strings"
 )
 
-var HTTP_407 = []byte("HTTP/1.1 407 Proxy Authorization Required\r\nProxy-Authenticate: Basic realm=\"Secure Proxys\"\r\n\r\n")
+// HTTP407 http 407 response
+var HTTP407 = []byte("HTTP/1.1 407 Proxy Authorization Required\r\nProxy-Authenticate: Basic realm=\"Secure Proxys\"\r\n\r\n")
 
-// Auth provides basic authorizaton for proxy server.
-func (proxy *ProxyServer) Auth(rw http.ResponseWriter, req *http.Request) bool {
+// Auth provides basic authorization for proxy server.
+func (proxy *Server) Auth(rw http.ResponseWriter, req *http.Request) bool {
 	var err error
 	if cnfg.Reverse == false && cnfg.Auth == true { //代理服务器登入认证
 		if proxy.User, err = proxy.auth(rw, req); err != nil {
@@ -24,14 +25,14 @@ func (proxy *ProxyServer) Auth(rw http.ResponseWriter, req *http.Request) bool {
 	return false
 }
 
-func (proxy *ProxyServer) auth(rw http.ResponseWriter, req *http.Request) (string, error) {
+func (proxy *Server) auth(rw http.ResponseWriter, req *http.Request) (string, error) {
 
 	auth := req.Header.Get("Proxy-Authorization")
 	auth = strings.Replace(auth, "Basic ", "", 1)
 
 	if auth == "" {
-		NeedAuth(rw, HTTP_407)
-		return "", errors.New("Need Proxy Authorization!")
+		NeedAuth(rw, HTTP407)
+		return "", errors.New("need proxy authorization")
 	}
 
 	data, err := base64.StdEncoding.DecodeString(auth)
@@ -44,7 +45,7 @@ func (proxy *ProxyServer) auth(rw http.ResponseWriter, req *http.Request) (strin
 
 	userPasswdPair := strings.Split(string(data), ":")
 	if len(userPasswdPair) != 2 {
-		NeedAuth(rw, HTTP_407)
+		NeedAuth(rw, HTTP407)
 		return "", errors.New("Fail to log in")
 	}
 
@@ -52,12 +53,13 @@ func (proxy *ProxyServer) auth(rw http.ResponseWriter, req *http.Request) (strin
 	passwd = userPasswdPair[1]
 
 	if Check(user, passwd) == false {
-		NeedAuth(rw, HTTP_407)
+		NeedAuth(rw, HTTP407)
 		return "", errors.New("Fail to log in")
 	}
 	return user, nil
 }
 
+// NeedAuth requires authorization
 func NeedAuth(rw http.ResponseWriter, challenge []byte) error {
 	hj, _ := rw.(http.Hijacker)
 	client, _, err := hj.Hijack()

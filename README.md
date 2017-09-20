@@ -1,4 +1,6 @@
 ## httpproxy
+[![Go Report Card](https://goreportcard.com/badge/github.com/sakeven/httpproxy)](https://goreportcard.com/report/github.com/sakeven/httpproxy)
+
 * 基于 Go 开发，支持 HTTP/1.1 以上版本的 HTTP 代理。
 
 ## 细节功能：

@@ -12,14 +12,17 @@ import (
 	cache "github.com/sakeven/httpproxy/cache"
 )
 
+// MD5URI returns md5 hash of uri.
 func MD5URI(uri string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(uri)))
 }
 
+// CacheBox is an redis instance to store cache.
 type CacheBox struct {
 	pool *redis.Pool
 }
 
+// NewCacheBox creates a redis cache implemented cache.Box.
 func NewCacheBox(address string, password string) *CacheBox {
 	pool := &redis.Pool{
 		MaxIdle:     5,
@@ -54,7 +57,8 @@ func NewCacheBox(address string, password string) *CacheBox {
 
 }
 
-func (c *CacheBox) Get(uri string) cache.Cache {
+// Get gets an item of specific uri.
+func (c *CacheBox) Get(uri string) cache.Item {
 	log.Println("get cahche of ", uri)
 	if cache := c.get(MD5URI(uri)); cache != nil {
 		//log.Println(*cache)
@@ -76,6 +80,7 @@ func (c *CacheBox) get(md5URI string) *Cache {
 	return cache
 }
 
+// Delete deletes an item of specific uri.
 func (c *CacheBox) Delete(uri string) {
 	c.delete(MD5URI(uri))
 }
@@ -93,6 +98,7 @@ func (c *CacheBox) delete(md5URI string) {
 	return
 }
 
+// CheckAndStore checks resp and then store it of specific uri.
 func (c *CacheBox) CheckAndStore(uri string, resp *http.Response) {
 	if !IsCache(resp) {
 		return
@@ -127,6 +133,5 @@ func (c *CacheBox) CheckAndStore(uri string, resp *http.Response) {
 
 }
 
-func (c *CacheBox) Clear(d time.Duration) {
-
-}
+// Clear refresh cache box in d.
+func (c *CacheBox) Clear(d time.Duration) {}

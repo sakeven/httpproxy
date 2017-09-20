@@ -5,7 +5,8 @@ import (
 	"strings"
 )
 
-func (proxy *ProxyServer) Ban(rw http.ResponseWriter, req *http.Request) bool {
+// Ban forbids requested URL in GFWList.
+func (proxy *Server) Ban(rw http.ResponseWriter, req *http.Request) bool {
 	if len(cnfg.GFWList) > 0 {
 		return proxy.ban(rw, req)
 	}
@@ -13,7 +14,7 @@ func (proxy *ProxyServer) Ban(rw http.ResponseWriter, req *http.Request) bool {
 	return false
 }
 
-func (proxy *ProxyServer) ban(rw http.ResponseWriter, req *http.Request) bool {
+func (proxy *Server) ban(rw http.ResponseWriter, req *http.Request) bool {
 	for _, gfwlist := range cnfg.GFWList { //屏蔽列表，检查访问对象是否被屏蔽
 		if strings.Index(req.RequestURI, gfwlist) != -1 && gfwlist != "" {
 			log.Infof("%s try to visit forbidden website %s", proxy.User, req.URL.Host)

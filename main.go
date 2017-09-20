@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	pxy := proxy.NewProxyServer()
+	pxy := proxy.NewServer()
 	web := proxy.NewWebServer()
 
 	go http.ListenAndServe(web.Port, web)

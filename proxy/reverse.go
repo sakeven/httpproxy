@@ -5,14 +5,14 @@ import (
 )
 
 // ReverseHandler handles request for reverse proxy.
-func (proxy *ProxyServer) ReverseHandler(req *http.Request) {
+func (proxy *Server) ReverseHandler(req *http.Request) {
 	if cnfg.Reverse == true { //用于反向代理
 		proxy.reverseHandler(req)
 	}
 }
 
 // reverseHandler handles request for reverse proxy.
-func (proxy *ProxyServer) reverseHandler(req *http.Request) {
+func (proxy *Server) reverseHandler(req *http.Request) {
 	req.Host = cnfg.ProxyPass
 	req.URL.Host = req.Host
 	req.URL.Scheme = "http"
