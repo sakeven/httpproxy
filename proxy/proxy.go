@@ -88,7 +88,7 @@ func (proxy *Server) HTTPHandler(rw http.ResponseWriter, req *http.Request) {
 
 	rw.WriteHeader(resp.StatusCode) //写入响应状态
 
-	nr, err := io.Copy(rw, resp.Body)
+	nr, err := ioCopy(rw, resp.Body)
 	if err != nil && err != io.EOF {
 		log.Errorf("%v got an error when copy remote response to client. %v\n", proxy.User, err)
 		return
@@ -122,20 +122,35 @@ func (proxy *Server) HTTPSHandler(rw http.ResponseWriter, req *http.Request) {
 
 	client.Write(HTTP200)
 
-	go copyRemoteToClient(proxy.User, remote, client)
-	go copyRemoteToClient(proxy.User, client, remote)
+	go ioCopy(remote, client)
+	go ioCopy(client, remote)
 }
 
-func copyRemoteToClient(User string, remote, client net.Conn) {
+func ioCopy(dst io.Writer, src io.ReadCloser) (nr int, err error) {
+	var buf = GetBuf()
 	defer func() {
-		remote.Close()
-		client.Close()
+		PutBuf(buf)
+		src.Close()
 	}()
 
-	nr, err := io.Copy(remote, client)
-	if err != nil && err != io.EOF {
-		//log.Error("%v got an error when handles CONNECT %v\n", User, err)
-		return
+	var rerr, werr error
+	var n int
+	for {
+		n, rerr = src.Read(buf)
+		if n > 0 {
+			_, werr = dst.Write(buf[:n])
+			if flusher, ok := dst.(http.Flusher); ok {
+				flusher.Flush()
+			}
+			nr += n
+		}
+
+		err = rerr
+		if werr != nil {
+			err = werr
+		}
+		if err != nil {
+			return
+		}
 	}
-	log.Infof("%v transported %v bytes betwwen %v and %v.\n", User, nr, remote.RemoteAddr(), client.RemoteAddr())
 }
