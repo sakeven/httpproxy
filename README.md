@@ -65,5 +65,3 @@
 
         $ ./${GOPATH}/bin/httpproxy
 
-## Bug 
-联系作者 sakeven.jiang@gmail.com
