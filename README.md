@@ -3,6 +3,8 @@
 
 * 基于 Go 开发，支持 HTTP/1.1 以上版本的 HTTP 代理。
 
+尝试下 TCP 流量加密代理：[Mika](https://github.com/sakeven/mika)
+
 ## 细节功能：
 * 支持内容缓存和重校验
 * 支持 GET、POST、CONNECT 等方法
